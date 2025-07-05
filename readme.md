@@ -1,476 +1,111 @@
-<!-- If working in virtual environment -->
-Activate the virtual env and run the below command :
+# Seller Dispute Manager
+
+## Setup Instructions
+
+### 1. Clone the Repository
+```bash
+git clone <your-repo-url>
+cd seller_dispute_manager
+```
+
+---
+
+## Option 1: Manual Setup (Local Development)
+
+### 2. Create and Activate a Virtual Environment
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
+
+### 3. Install Dependencies
+```bash
 pip install -r requirements.txt
+```
 
-<!-- Clear the migrations -->
-Tasks ---> migrations ----> this folder should have only one file __init__.py , remove all other files
+### 4. Set Up PostgreSQL Database
+- Ensure PostgreSQL is installed and running.
+- Create the database and user manually:
+```bash
+psql -U postgres
+# In the psql shell, run:
+CREATE DATABASE seller_db;
+CREATE USER seller_rw WITH PASSWORD 'seller_rw';
+GRANT ALL PRIVILEGES ON DATABASE seller_db TO seller_rw;
+\q
+```
 
-<!-- To remove the db.sqlite3 -->
-Run this command : rm db.sqlite3 
+### 5. Configure Environment Variables (Optional)
+- By default, the project uses:
+  - DB name: `seller_db`
+  - User: `seller_rw`
+  - Password: `seller_rw`
+  - Host: `localhost`
+  - Port: `5432`
+- You can override these by setting the environment variables: `DJANGO_DB_NAME`, `DJANGO_DB_USER`, `DJANGO_DB_PASSWORD`, `DJANGO_DB_HOST`, `DJANGO_DB_PORT`.
 
+### 6. Remove Old Migrations and Database (Optional, for a clean start)
+```bash
+find seller_dispute/migrations/ -not -name '__init__.py' -name '*.py' -delete
+rm -f db.sqlite3
+```
+
+### 7. Run Migrations
+```bash
 python manage.py makemigrations
 python manage.py migrate
+```
 
-<!-- To create random 50 users -->
-Run this command : python manage.py create_users
+### 8. Create Sample Data (Optional)
+```bash
+# Create 50 random users
+python manage.py create_users
+# Create sample orders and returns
+python manage.py create_orders_and_returns
+# Create sample dispute entries
+python manage.py seed_dispute_cases
+```
 
-<!-- API EndPoints -->
-Tasks API (TasksViewSet)
+### 9. Run the Development Server
+```bash
+python manage.py runserver
+```
 
-GET	    /tasks/	                  Fetch all tasks
-GET	    /tasks/{tasks_id}/	      Get a specific task
+---
 
-POST    /tasks/{task_id}/assign/  To assign task to users
-Payload : {
-  "assigned_users": [3,2]
-}
+## Option 2: Run with Docker
 
-User-Assigned Tasks API (UserTasksViewSet)
+### 1. Build and Start the Containers
+```bash
+docker-compose up --build
+```
+- This will start both the Django app and a PostgreSQL database using the settings in `docker-compose.yml`.
+- The web app will be available at [http://localhost:8000](http://localhost:8000)
 
-GET	    /user-tasks/?user_id=1	   Fetch tasks assigned to user id=1
+### 2. Run Migrations and Seed Data (in a separate terminal)
+```bash
+docker-compose exec web python manage.py migrate
+docker-compose exec web python manage.py create_users
+docker-compose exec web python manage.py create_orders_and_returns
+docker-compose exec web python manage.py seed_dispute_cases
+```
+
+---
+
+## Project Structure
+- `seller_dispute/` - Main Django app for dispute management
+- `seller_dispute_manager/` - Project settings and configuration
+- `venv/` - Virtual environment (not tracked by git)
 
 
-<!-- SAMPLE API Requests and responses -->
+## API Endpoints
+This project is primarily server-rendered (HTMX + Django templates). If you want to use or extend RESTful APIs, see `seller_dispute/urls.py` and `seller_dispute/views/dispute_case.py`.
 
-<!-- To create tasks :  -->
 
-curl --location 'localhost:8000/task/' \
---header 'Content-Type: application/json' \
---data '{
-  "name": "Five Task",
-  "description": "Fix homepage issue"
-}'
+## Notes
+- The project uses Django and Django REST Framework.
+- For HTMX endpoints, responses are HTML fragments for dynamic UI updates.
+- For RESTful endpoints, responses are JSON (see DRF viewsets/serializers).
 
-Response : 
-{
-    "id": 12,
-    "name": "Five Task",
-    "description": "Fix homepage issue",
-    "created_at": "2025-03-26T04:52:35.888128Z",
-    "task_type": null,
-    "completed_at": null,
-    "status": "pending",
-    "assigned_users": []
-}
 
-<!-- To assign tasks : -->
-
-curl --location 'localhost:8000/task/11/assign/' \
---header 'Content-Type: application/json' \
---data '{
-  "assigned_users": [46]
-}'
-
-Response : 
-{
-    "message": "Task assigned successfully"
-}
-
-<!-- To get tasks assigned to a user -->
-curl --location 'localhost:8000/user_task/?user_id=46'
-
-Response :
-{
-    "count": 11,
-    "next": "http://localhost:8000/user_task/?page=2&user_id=46",
-    "previous": null,
-    "results": [
-        {
-            "id": 1,
-            "name": "First Task",
-            "description": "Fix homepage issue",
-            "created_at": "2025-03-26T02:07:50.170847Z",
-            "task_type": null,
-            "completed_at": null,
-            "status": "pending",
-            "assigned_users": [
-                {
-                    "id": 46,
-                    "username": "user45_XjIf",
-                    "email": "user45_XjIf@example.com",
-                    "phone": "9876571075",
-                    "date_of_birth": "2003-11-15"
-                }
-            ]
-        },
-        {
-            "id": 2,
-            "name": "Second Task",
-            "description": "Fix homepage issue",
-            "created_at": "2025-03-26T02:07:54.879600Z",
-            "task_type": null,
-            "completed_at": null,
-            "status": "pending",
-            "assigned_users": [
-                {
-                    "id": 46,
-                    "username": "user45_XjIf",
-                    "email": "user45_XjIf@example.com",
-                    "phone": "9876571075",
-                    "date_of_birth": "2003-11-15"
-                }
-            ]
-        },
-        {
-            "id": 3,
-            "name": "Third Task",
-            "description": "Fix homepage issue",
-            "created_at": "2025-03-26T02:08:01.215918Z",
-            "task_type": null,
-            "completed_at": null,
-            "status": "pending",
-            "assigned_users": [
-                {
-                    "id": 46,
-                    "username": "user45_XjIf",
-                    "email": "user45_XjIf@example.com",
-                    "phone": "9876571075",
-                    "date_of_birth": "2003-11-15"
-                }
-            ]
-        },
-        {
-            "id": 4,
-            "name": "Fourth Task",
-            "description": "Fix homepage issue",
-            "created_at": "2025-03-26T02:08:05.574639Z",
-            "task_type": null,
-            "completed_at": null,
-            "status": "pending",
-            "assigned_users": [
-                {
-                    "id": 46,
-                    "username": "user45_XjIf",
-                    "email": "user45_XjIf@example.com",
-                    "phone": "9876571075",
-                    "date_of_birth": "2003-11-15"
-                }
-            ]
-        },
-        {
-            "id": 5,
-            "name": "Five Task",
-            "description": "Fix homepage issue",
-            "created_at": "2025-03-26T04:34:56.268273Z",
-            "task_type": null,
-            "completed_at": null,
-            "status": "pending",
-            "assigned_users": [
-                {
-                    "id": 46,
-                    "username": "user45_XjIf",
-                    "email": "user45_XjIf@example.com",
-                    "phone": "9876571075",
-                    "date_of_birth": "2003-11-15"
-                }
-            ]
-        },
-        {
-            "id": 6,
-            "name": "Five Task",
-            "description": "Fix homepage issue",
-            "created_at": "2025-03-26T04:51:56.220108Z",
-            "task_type": null,
-            "completed_at": null,
-            "status": "pending",
-            "assigned_users": [
-                {
-                    "id": 46,
-                    "username": "user45_XjIf",
-                    "email": "user45_XjIf@example.com",
-                    "phone": "9876571075",
-                    "date_of_birth": "2003-11-15"
-                }
-            ]
-        },
-        {
-            "id": 7,
-            "name": "Five Task",
-            "description": "Fix homepage issue",
-            "created_at": "2025-03-26T04:51:58.741238Z",
-            "task_type": null,
-            "completed_at": null,
-            "status": "pending",
-            "assigned_users": [
-                {
-                    "id": 46,
-                    "username": "user45_XjIf",
-                    "email": "user45_XjIf@example.com",
-                    "phone": "9876571075",
-                    "date_of_birth": "2003-11-15"
-                }
-            ]
-        },
-        {
-            "id": 8,
-            "name": "Five Task",
-            "description": "Fix homepage issue",
-            "created_at": "2025-03-26T04:52:33.683985Z",
-            "task_type": null,
-            "completed_at": null,
-            "status": "pending",
-            "assigned_users": [
-                {
-                    "id": 46,
-                    "username": "user45_XjIf",
-                    "email": "user45_XjIf@example.com",
-                    "phone": "9876571075",
-                    "date_of_birth": "2003-11-15"
-                }
-            ]
-        },
-        {
-            "id": 9,
-            "name": "Five Task",
-            "description": "Fix homepage issue",
-            "created_at": "2025-03-26T04:52:34.346862Z",
-            "task_type": null,
-            "completed_at": null,
-            "status": "pending",
-            "assigned_users": [
-                {
-                    "id": 46,
-                    "username": "user45_XjIf",
-                    "email": "user45_XjIf@example.com",
-                    "phone": "9876571075",
-                    "date_of_birth": "2003-11-15"
-                }
-            ]
-        },
-        {
-            "id": 10,
-            "name": "Five Task",
-            "description": "Fix homepage issue",
-            "created_at": "2025-03-26T04:52:34.979479Z",
-            "task_type": null,
-            "completed_at": null,
-            "status": "pending",
-            "assigned_users": [
-                {
-                    "id": 46,
-                    "username": "user45_XjIf",
-                    "email": "user45_XjIf@example.com",
-                    "phone": "9876571075",
-                    "date_of_birth": "2003-11-15"
-                }
-            ]
-        }
-    ]
-}
-
-<!-- To get specific task : -->
-
-curl --location 'localhost:8000/task/2'
-
-Response:
-{
-    "id": 2,
-    "name": "Second Task",
-    "description": "Fix homepage issue",
-    "created_at": "2025-03-26T02:07:54.879600Z",
-    "task_type": null,
-    "completed_at": null,
-    "status": "pending",
-    "assigned_users": [
-        {
-            "id": 46,
-            "username": "user45_XjIf",
-            "email": "user45_XjIf@example.com",
-            "phone": "9876571075",
-            "date_of_birth": "2003-11-15"
-        }
-    ]
-}
-
-<!-- To get all tasks :  -->
-
-curl --location 'localhost:8000/tasks'
-
-Response : 
-{
-    "count": 12,
-    "next": "http://localhost:8000/task/?page=2",
-    "previous": null,
-    "results": [
-        {
-            "id": 1,
-            "name": "First Task",
-            "description": "Fix homepage issue",
-            "created_at": "2025-03-26T02:07:50.170847Z",
-            "task_type": null,
-            "completed_at": null,
-            "status": "pending",
-            "assigned_users": [
-                {
-                    "id": 46,
-                    "username": "user45_XjIf",
-                    "email": "user45_XjIf@example.com",
-                    "phone": "9876571075",
-                    "date_of_birth": "2003-11-15"
-                }
-            ]
-        },
-        {
-            "id": 2,
-            "name": "Second Task",
-            "description": "Fix homepage issue",
-            "created_at": "2025-03-26T02:07:54.879600Z",
-            "task_type": null,
-            "completed_at": null,
-            "status": "pending",
-            "assigned_users": [
-                {
-                    "id": 46,
-                    "username": "user45_XjIf",
-                    "email": "user45_XjIf@example.com",
-                    "phone": "9876571075",
-                    "date_of_birth": "2003-11-15"
-                }
-            ]
-        },
-        {
-            "id": 3,
-            "name": "Third Task",
-            "description": "Fix homepage issue",
-            "created_at": "2025-03-26T02:08:01.215918Z",
-            "task_type": null,
-            "completed_at": null,
-            "status": "pending",
-            "assigned_users": [
-                {
-                    "id": 46,
-                    "username": "user45_XjIf",
-                    "email": "user45_XjIf@example.com",
-                    "phone": "9876571075",
-                    "date_of_birth": "2003-11-15"
-                }
-            ]
-        },
-        {
-            "id": 4,
-            "name": "Fourth Task",
-            "description": "Fix homepage issue",
-            "created_at": "2025-03-26T02:08:05.574639Z",
-            "task_type": null,
-            "completed_at": null,
-            "status": "pending",
-            "assigned_users": [
-                {
-                    "id": 46,
-                    "username": "user45_XjIf",
-                    "email": "user45_XjIf@example.com",
-                    "phone": "9876571075",
-                    "date_of_birth": "2003-11-15"
-                }
-            ]
-        },
-        {
-            "id": 5,
-            "name": "Five Task",
-            "description": "Fix homepage issue",
-            "created_at": "2025-03-26T04:34:56.268273Z",
-            "task_type": null,
-            "completed_at": null,
-            "status": "pending",
-            "assigned_users": [
-                {
-                    "id": 46,
-                    "username": "user45_XjIf",
-                    "email": "user45_XjIf@example.com",
-                    "phone": "9876571075",
-                    "date_of_birth": "2003-11-15"
-                }
-            ]
-        },
-        {
-            "id": 6,
-            "name": "Five Task",
-            "description": "Fix homepage issue",
-            "created_at": "2025-03-26T04:51:56.220108Z",
-            "task_type": null,
-            "completed_at": null,
-            "status": "pending",
-            "assigned_users": [
-                {
-                    "id": 46,
-                    "username": "user45_XjIf",
-                    "email": "user45_XjIf@example.com",
-                    "phone": "9876571075",
-                    "date_of_birth": "2003-11-15"
-                }
-            ]
-        },
-        {
-            "id": 7,
-            "name": "Five Task",
-            "description": "Fix homepage issue",
-            "created_at": "2025-03-26T04:51:58.741238Z",
-            "task_type": null,
-            "completed_at": null,
-            "status": "pending",
-            "assigned_users": [
-                {
-                    "id": 46,
-                    "username": "user45_XjIf",
-                    "email": "user45_XjIf@example.com",
-                    "phone": "9876571075",
-                    "date_of_birth": "2003-11-15"
-                }
-            ]
-        },
-        {
-            "id": 8,
-            "name": "Five Task",
-            "description": "Fix homepage issue",
-            "created_at": "2025-03-26T04:52:33.683985Z",
-            "task_type": null,
-            "completed_at": null,
-            "status": "pending",
-            "assigned_users": [
-                {
-                    "id": 46,
-                    "username": "user45_XjIf",
-                    "email": "user45_XjIf@example.com",
-                    "phone": "9876571075",
-                    "date_of_birth": "2003-11-15"
-                }
-            ]
-        },
-        {
-            "id": 9,
-            "name": "Five Task",
-            "description": "Fix homepage issue",
-            "created_at": "2025-03-26T04:52:34.346862Z",
-            "task_type": null,
-            "completed_at": null,
-            "status": "pending",
-            "assigned_users": [
-                {
-                    "id": 46,
-                    "username": "user45_XjIf",
-                    "email": "user45_XjIf@example.com",
-                    "phone": "9876571075",
-                    "date_of_birth": "2003-11-15"
-                }
-            ]
-        },
-        {
-            "id": 10,
-            "name": "Five Task",
-            "description": "Fix homepage issue",
-            "created_at": "2025-03-26T04:52:34.979479Z",
-            "task_type": null,
-            "completed_at": null,
-            "status": "pending",
-            "assigned_users": [
-                {
-                    "id": 46,
-                    "username": "user45_XjIf",
-                    "email": "user45_XjIf@example.com",
-                    "phone": "9876571075",
-                    "date_of_birth": "2003-11-15"
-                }
-            ]
-        }
-    ]
-}
+---
