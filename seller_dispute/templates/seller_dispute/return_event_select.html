@@ -1,0 +1,6 @@
+<select name="return_event" id="id_return_event" class="form-select">
+  <option value="">Select a return...</option>
+  {% for r in returns %}
+    <option value="{{ r.id }}">{{ r.return_id }} - {{ r.order.order_id }} ({{ r.order.customer_name }})</option>
+  {% endfor %}
+</select> 

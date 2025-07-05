@@ -1,0 +1,35 @@
+<div class="mb-4">
+  <h6 class="text-primary">Dispute Details</h6>
+  <p><strong>Status:</strong> {{ dispute_case.status|title }}</p>
+  <p><strong>Case Number:</strong> {{ dispute_case.case_number }}</p>
+  <p><strong>Created At:</strong> {{ dispute_case.created_at|date:'Y-m-d H:i' }}</p>
+  <p><strong>Last Updated:</strong> {{ dispute_case.updated_at|date:'Y-m-d H:i' }}</p>
+</div>
+<hr/>
+<h6 class="mb-3 text-primary">Timeline</h6>
+<ul class="list-group list-group-flush">
+  {% for update in updates %}
+    <li class="list-group-item">
+      <div class="d-flex justify-content-between align-items-center">
+        <span>
+          <strong>Status:</strong>
+          {% if update.status == 'open' %}
+            <span class="badge bg-primary">{{ update.status|title }}</span>
+          {% elif update.status == 'in_review' %}
+            <span class="badge bg-warning text-dark">{{ update.status|title }}</span>
+          {% elif update.status == 'resolved' %}
+            <span class="badge bg-success">{{ update.status|title }}</span>
+          {% elif update.status == 'rejected' %}
+            <span class="badge bg-danger">{{ update.status|title }}</span>
+          {% else %}
+            <span class="badge bg-secondary">{{ update.status|title }}</span>
+          {% endif %}<br/>
+          <strong>Comment:</strong> {{ update.comment|default:'-' }}
+        </span>
+        <span class="text-muted small">{{ update.updated_at|date:'Y-m-d H:i' }}</span>
+      </div>
+    </li>
+  {% empty %}
+    <li class="list-group-item text-muted">No updates yet.</li>
+  {% endfor %}
+</ul> 

@@ -1,0 +1,11 @@
+<div class="mb-4">
+  <h6 class="text-warning">Return Details</h6>
+  <ul class="list-group list-group-flush">
+    <li class="list-group-item"><strong>Return ID:</strong> {{ return_event.return_id }}</li>
+    <li class="list-group-item"><strong>Return Reason:</strong> {{ return_event.return_reason }}</li>
+    <li class="list-group-item"><strong>Return Tracking Number:</strong> {{ return_event.return_tracking_number }}</li>
+    <li class="list-group-item"><strong>Return Date:</strong> {{ return_event.return_date|date:'Y-m-d H:i' }}</li>
+    <li class="list-group-item"><strong>Original Item Condition:</strong> {{ return_event.original_item_condition }}</li>
+    <li class="list-group-item"><strong>Notes:</strong> {{ return_event.notes }}</li>
+  </ul>
+</div> 

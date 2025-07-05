@@ -1,0 +1,13 @@
+<div class="mb-4">
+  <h6 class="text-success">Order Details</h6>
+  <ul class="list-group list-group-flush">
+    <li class="list-group-item"><strong>Order ID:</strong> {{ order.order_id }}</li>
+    <li class="list-group-item"><strong>Customer Name:</strong> {{ order.customer_name }}</li>
+    <li class="list-group-item"><strong>Customer Email:</strong> {{ order.customer_email }}</li>
+    <li class="list-group-item"><strong>Customer Address:</strong> {{ order.customer_address }}</li>
+    <li class="list-group-item"><strong>Order Date:</strong> {{ order.order_date|date:'Y-m-d H:i' }}</li>
+    <li class="list-group-item"><strong>Item SKU:</strong> {{ order.item_sku }}</li>
+    <li class="list-group-item"><strong>Item Name:</strong> {{ order.item_name }}</li>
+    <li class="list-group-item"><strong>Item Quantity:</strong> {{ order.item_quantity }}</li>
+  </ul>
+</div> 

@@ -1,0 +1,53 @@
+<div class="modal fade show" id="disputeCaseDetailModal" tabindex="-1" aria-labelledby="disputeCaseDetailModalLabel" aria-modal="true" style="display: block;">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="disputeCaseDetailModalLabel">Dispute Case Details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Tabs -->
+        <ul class="nav nav-tabs" id="disputeCaseTabs" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="timeline-tab" data-bs-toggle="tab" data-bs-target="#timeline" type="button" role="tab" aria-controls="timeline" aria-selected="true"
+              hx-get="{% url 'dispute_case_timeline_api' dispute_case.id %}" hx-target="#timeline" hx-trigger="click" hx-swap="innerHTML">
+              Dispute Timeline
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="order-tab" data-bs-toggle="tab" data-bs-target="#order" type="button" role="tab" aria-controls="order" aria-selected="false"
+              hx-get="{% url 'order_details_api' dispute_case.id %}" hx-target="#order" hx-trigger="click" hx-swap="innerHTML">
+              Order Details
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="return-tab" data-bs-toggle="tab" data-bs-target="#return" type="button" role="tab" aria-controls="return" aria-selected="false"
+              hx-get="{% url 'return_details_api' dispute_case.id %}" hx-target="#return" hx-trigger="click" hx-swap="innerHTML">
+              Return Details
+            </button>
+          </li>
+        </ul>
+        <div class="tab-content mt-3">
+          <div class="tab-pane fade show active" id="timeline" role="tabpanel" aria-labelledby="timeline-tab">
+            <!-- Timeline content will be loaded here by HTMX -->
+          </div>
+          <div class="tab-pane fade" id="order" role="tabpanel" aria-labelledby="order-tab">
+            <!-- Order details will be loaded here by HTMX -->
+          </div>
+          <div class="tab-pane fade" id="return" role="tabpanel" aria-labelledby="return-tab">
+            <!-- Return details will be loaded here by HTMX -->
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  var modal = new bootstrap.Modal(document.getElementById('disputeCaseDetailModal'));
+  modal.show();
+  // Auto-load the first tab content
+  document.getElementById('timeline-tab').click();
+</script> 
