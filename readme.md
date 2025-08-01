@@ -77,17 +77,17 @@ python manage.py runserver
 
 ### 1. Build and Start the Containers
 ```bash
-docker-compose up --build
+docker compose up --build
 ```
 - This will start both the Django app and a PostgreSQL database using the settings in `docker-compose.yml`.
 - The web app will be available at [http://localhost:8000](http://localhost:8000)
 
 ### 2. Run Migrations and Seed Data (in a separate terminal)
 ```bash
-docker-compose exec web python manage.py migrate
-docker-compose exec web python manage.py create_users
-docker-compose exec web python manage.py create_orders_and_returns
-docker-compose exec web python manage.py seed_dispute_cases
+docker compose exec web python manage.py migrate
+docker compose exec web python manage.py create_users
+docker compose exec web python manage.py create_orders_and_returns
+docker compose exec web python manage.py seed_dispute_cases
 ```
 
 ---
